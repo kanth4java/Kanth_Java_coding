@@ -1,0 +1,124 @@
+How do you design an application with JMS messaging?
+The Java Message Service (JMS) API is a messaging standard that allows application components based on the Java Platform Enterprise Edition (Java EE) 
+to create, send, receive, and read messages. It enables distributed communication that is loosely coupled, reliable, and asynchronous.
+Steps to Design an JMS Application:
+1.Look up JMS Connection Factory in JNDI
+2.Create Connection Using the Connection Factory 
+3.Create Session Using the Connection
+4.Look Up Destinations(Topics and Queues) in JNDI
+5.Create Message Producers and Message Consumers Using Session and Destinations
+6.Creating message Object from Message Producer
+7.If Asynchornous mode register message Listener
+8.Start Connection 
+
+Example of JMS by using active MQ:
+
+Sender.java:
+
+
+import java.util.Properties;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.QueueSender;
+import javax.jms.DeliveryMode;
+import javax.jms.QueueSession;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+
+public class Sender {
+
+	public static void main(String[] args) throws Exception {
+		Properties env = new Properties();
+		env.put(Context.INITIAL_CONTEXT_FACTORY,
+				"org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+		env.put(Context.PROVIDER_URL, "tcp://localhost:61616");
+		env.put("queue.queueSampleQueue", "MyNewQueue");
+		
+		// get the initial context
+		InitialContext ctx = new InitialContext(env);
+
+		// lookup the queue object
+		Queue queue = (Queue) ctx.lookup("queueSampleQueue");
+		// lookup the queue connection factory
+		QueueConnectionFactory connFactory = (QueueConnectionFactory) ctx.lookup("QueueConnectionFactory");
+		// create a queue connection
+		QueueConnection queueConn = connFactory.createQueueConnection();
+
+		// create a queue session
+		QueueSession queueSession = queueConn.createQueueSession(false,Session.DUPS_OK_ACKNOWLEDGE);
+
+		// create a queue sender
+		QueueSender queueSender = queueSession.createSender(queue);
+		queueSender.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+
+		// create a simple message to say "Hello"
+		TextMessage message = queueSession.createTextMessage("Hello");
+
+		// send the message
+		queueSender.send(message);
+
+		System.out.println("sent: " + message.getText());
+
+		queueConn.close();
+	}
+} 
+
+Receiver.java
+
+import java.util.Properties;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.QueueSession;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+
+public class Receiver {
+
+	public static void main(String args[]) throws Exception {
+		Properties env = new Properties();					   				env.put(Context.INITIAL_CONTEXT_FACTORY,
+				"org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+		env.put(Context.PROVIDER_URL, "tcp://localhost:61616");
+		env.put("queue.queueSampleQueue","MyNewQueue");
+		// get the initial context
+		InitialContext ctx = new InitialContext(env);
+
+		// lookup the queue object
+		Queue queue = (Queue) ctx.lookup("queueSampleQueue");
+
+		// lookup the queue connection factory
+		QueueConnectionFactory connFactory = (QueueConnectionFactory) ctx.lookup("QueueConnectionFactory");
+
+		// create a queue connection
+		QueueConnection queueConn = connFactory.createQueueConnection();
+
+		// create a queue session
+		QueueSession queueSession = queueConn.createQueueSession(false,Session.AUTO_ACKNOWLEDGE);
+
+		// create a queue receiver
+		QueueReceiver queueReceiver = queueSession.createReceiver(queue);
+
+		// start the connection
+		queueConn.start();
+
+		// receive a message
+		TextMessage message = (TextMessage) queueReceiver.receive();
+
+		// print the message
+		System.out.println("received: " + message.getText());
+
+		// close the queue connection
+		queueConn.close();
+	}
+}
+
+

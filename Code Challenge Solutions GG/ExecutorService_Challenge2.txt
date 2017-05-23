@@ -1,0 +1,42 @@
+How would you implement Executor Service? 
+
+1.ExecutorService interface represents an asynchronous execution mechanism which is capable of executing tasks in the background
+2.ExecutorService automatically provides a pool of threads and API for assigning tasks to it.
+3.ExecutorService also provides methods for submitting large collections of Callable objects. 
+4.Finally, ExecutorService provides a number of methods for managing the shutdown of the executor. 
+Since ExecutorService is an interface, you need to its implementations in order to make any use of it.
+ The ExecutorService has the following implementation in the java.util.concurrent package:
+
+ThreadPoolExecutor
+ScheduledThreadPoolExecutor
+
+
+ Creating a Excutor Service by using following ways
+////returns returns ExecutorService with one thread pool size.It can never increase its thread pool size more than one. 
+1.ExecutorService executorService1 = Executors.newSingleThreadExecutor();
+
+Example:
+ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+executorService.execute(new Runnable() {
+    public void run() {
+        System.out.println("Asynchronous task");
+    }
+});
+
+executorService.shutdown();
+
+//returns ExecutorService with 10 thread pool size
+//If more than 10 tasks are submitted then they are held in a queue until threads become available.
+2. ExecutorService executorService2 = Executors.newFixedThreadPool(10);
+
+//ScheduledExecutorService is created with 5 threads
+ExecutorService executorService3 = Executors.newScheduledThreadPool(10);
+
+
+Different task to delegate  execution to an ExecutorService:
+execute(Runnable)
+submit(Runnable)//The submit(Runnable) method also takes a Runnable implementation, but returns a Future object.
+submit(Callable)//The Callable's result can be obtained via the Future object returned by the submit(Callable) method. 
+invokeAny()//Invoking this method does not return a Future, but returns the result of one of the Callable object
+invokeAll()//The invokeAll() returns a list of Future objects via which you can obtain the results of the executions of each Callable

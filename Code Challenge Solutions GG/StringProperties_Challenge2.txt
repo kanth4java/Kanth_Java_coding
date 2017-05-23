@@ -1,0 +1,47 @@
+Describe properties of Java String.
+
+
+
+String:Strings, which are widely used in Java programming, are a sequence of characters
+
+Some properties of String :
+
+Immutable:
+
+The String class is immutable, so that once it is created a String object cannot be changed. 
+If there is a necessity to make a lot of modifications to Strings of characters, then you should use String Buffer & String Builder Classes.
+
+ Java String Concatenation
+
++ is a special operator when it comes to java String. It helps to concatenate two String.
+
+Example:
+"Hello," + " world" + "!"
+
+
+Java String Connversion
+
+
+ToString:toString() is a method that belongs to Object class.
+Every wrapper classes implements toString() method which returns a String object of the passed primitive.
+
+Creating Format Strings:
+
+You have printf() and format() methods to print output with formatted numbers. 
+The String class has an equivalent class method, format(), that returns a String object rather than a PrintStream object.
+
+Exampe:
+String fs;
+fs = String.format("The value of the float " +
+                   "variable is %f, while " +
+                   "the value of the " + 
+                   "integer variable is %d, " +
+                   " and the string is %s",
+                   floatVar, intVar, stringVar);
+System.out.println(fs);
+
+
+String Length:
+
+Methods used to obtain information about an object are known as accessor methods.
+One accessor method that you can use with strings is the length() method, which returns the number of characters contained in the string object.

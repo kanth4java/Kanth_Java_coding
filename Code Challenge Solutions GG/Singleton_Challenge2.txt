@@ -1,0 +1,39 @@
+SingleTon Design Pattern:
+Singleton pattern restricts the instantiation of a class and ensures that only one instance of the class exists in the java virtual machine. The singleton class must provide a global access point to get the instance of the class
+
+Implementation:
+1.Make The Constructor Private so that this Class Cannot be Instantiated.
+2.create private static variable of same Class that is the only instance of the Class
+3.create  a public static method that returns the instance of class that can be accessed globally. 
+
+Example:
+ClassicSingleton.class
+
+public class ClassicSingleton {
+//Early initialization  using static field
+   private static ClassicSingleton instance = ClassicSingleton();
+//Making Constructor private 
+   private ClassicSingleton() {
+   }
+//Global Instance method which returns instance of class
+   public static  ClassicSingleton getInstance() {
+      return instance;
+   }
+   public void displayMessage(){
+    System.out.println("Hello message");
+   
+}
+
+SingletonPatternDemo.Class
+
+public class SingletonPatternDemo {
+   public static void main(String[] args) {
+
+     //we cannot instantiate the ClassicSingleton directly
+      
+      ClassicSingleton object = ClassicSingleton.getInstance();
+
+  
+      object.displayMessage();
+   }
+}

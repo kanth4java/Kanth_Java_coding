@@ -1,0 +1,139 @@
+You are to create two small applications for this programming task; one is called Randomizer, the other Prime Randomizer‘s job is to generate a series of positive random integers and send those to Prime via a distributed queue of integers. 
+
+Primes job is to receive the integers and calculate whether the integer is a prime or not and return the answer to Randomizer via a distributed queue ( just a java Queue implementation , no need to implement JMS etc  )  that contains the original number and a Boolean; which Randomizer will print to system out.
+
+Points
+1.      Use only the standard java library
+2.      Both Applications will run on the same server
+3.      The system should be as fast as possible
+4.      The results do not have to be returned in the same order as received
+5.      You don’t have to go overboard tweaking the prime check
+
+Deliverable
+
+1)	A project with code – eclipse or any IDE that you are using. However, eclipse is preferable
+2)	A Readme.txt should contain the following
+a.	What is your design and implementation?
+b.	Sample Output
+c.	Further work – if you have all the time in the world how would you implement
+
+
+Design : 1.Created CustomNumber Class that  contains both number value and corresponding Boolean Value.
+         2.Implemented ConcurrentLinkedQueue which is an appropriate choice when many threads will share access to a common collection. Like most other concurrent collection implementations, this class does not permit the use of null elements.
+         3.Randomizer Calls to generate a series of positive random integers and send those to Prime via a distributed queue of integers.
+	
+CustomNumber.java
+
+ 
+package com.Test.prime;
+
+public class CustomNumber {
+	private int value;
+	private boolean isPrime;
+
+	public int getValue() {
+		return value;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
+	}
+
+	public boolean isPrime() {
+		return isPrime;
+	}
+
+	public void setPrime(boolean isPrime) {
+		this.isPrime = isPrime;
+	}
+
+	@Override
+	public String toString() {
+		return "CustomNumber [value=" + value + ", isPrime=" + isPrime + "]";
+	}
+
+}
+
+Randomizer.Java
+
+
+package com.Test.prime;
+
+import java.util.Queue;
+import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+public class Randomizer {
+	Queue<CustomNumber> queue = new ConcurrentLinkedQueue<CustomNumber>();
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		Randomizer randomizer = new Randomizer();
+		randomizer.loadQueue(100);
+		
+		Prime primeRandomizer = new Prime();
+		primeRandomizer.setPrime(randomizer.queue);
+		System.out.println(randomizer.queue);
+		System.out.println("Size : "+randomizer.queue.size());
+
+	}
+	
+	private void loadQueue(int n) {
+		Random random = new Random();
+
+		for (int i = 0; i < n; i++) {
+			int randomNumber = random.nextInt();
+			//if generated radom is positive than only the number is added into the Queue
+			if (randomNumber > 0) {
+				CustomNumber customNumber = new CustomNumber();
+				customNumber.setValue(randomNumber);
+				queue.add(customNumber);
+			}
+		}
+	}
+
+
+}
+Prime.java:
+
+//Prime Recives the integers and calculate whether the integer is a prime or not and return the answer to Randomizer via a distributed queue 
+
+package com.Test.prime;
+
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+public class Prime {
+
+	static Queue<CustomNumber> queue = new ConcurrentLinkedQueue<CustomNumber>();
+
+	public void setPrime(Queue<CustomNumber> queue) {
+
+		if (queue.isEmpty()) {
+			return;
+		}
+		for (Iterator<CustomNumber> iter = queue.iterator(); iter.hasNext();) {
+			CustomNumber number = iter.next();
+			number.setPrime(isPrime(number.getValue()));
+		}
+
+	}
+
+	private boolean isPrime(int n) {
+		for (int i = 2; 2 * i < n; i++) {
+			if (n % i == 0)
+				return false;
+		}
+		return true;
+	}
+
+}
+Output:
+
+[CustomNumber [value=268087401, isPrime=false], CustomNumber [value=1896064928, isPrime=false], CustomNumber [value=2053718984, isPrime=false], CustomNumber [value=97553337, isPrime=false], CustomNumber [value=1204428457, isPrime=false], CustomNumber [value=2020274939, isPrime=false], CustomNumber [value=1438219006, isPrime=false], CustomNumber [value=1964357071, isPrime=false], CustomNumber [value=638599150, isPrime=false], CustomNumber [value=1506695224, isPrime=false], CustomNumber [value=815498168, isPrime=false], CustomNumber [value=153912345, isPrime=false], CustomNumber [value=80701358, isPrime=false], CustomNumber [value=392873734, isPrime=false], CustomNumber [value=1377300319, isPrime=false], CustomNumber [value=581434026, isPrime=false], CustomNumber [value=1917650873, isPrime=false], CustomNumber [value=1755839006, isPrime=false], CustomNumber [value=32166835, isPrime=false], CustomNumber [value=774734243, isPrime=true], CustomNumber [value=446949153, isPrime=false], CustomNumber [value=792662084, isPrime=false], CustomNumber [value=1532835713, isPrime=false], CustomNumber [value=1238405142, isPrime=false], CustomNumber [value=568958137, isPrime=false], CustomNumber [value=1959741220, isPrime=false], CustomNumber [value=973978842, isPrime=false], CustomNumber [value=1950996290, isPrime=false], CustomNumber [value=7059785, isPrime=false], CustomNumber [value=1095769462, isPrime=false], CustomNumber [value=1200093295, isPrime=false], CustomNumber [value=923219125, isPrime=false], CustomNumber [value=769993185, isPrime=false], CustomNumber [value=1302982769, isPrime=false], CustomNumber [value=777312962, isPrime=false], CustomNumber [value=1782368515, isPrime=false], CustomNumber [value=1378330102, isPrime=false], CustomNumber [value=931580655, isPrime=false], CustomNumber [value=1700951611, isPrime=false], CustomNumber [value=186386978, isPrime=false], CustomNumber [value=1942842823, isPrime=false], CustomNumber [value=380155145, isPrime=false], CustomNumber [value=344181551, isPrime=false], CustomNumber [value=1098965390, isPrime=false], CustomNumber [value=288297958, isPrime=false], CustomNumber [value=42673550, isPrime=false], CustomNumber [value=1793090133, isPrime=false], CustomNumber [value=1014915777, isPrime=false], CustomNumber [value=69100325, isPrime=false], CustomNumber [value=1257642221, isPrime=false], CustomNumber [value=914713196, isPrime=false], CustomNumber [value=372753422, isPrime=false], CustomNumber [value=1891570752, isPrime=false], CustomNumber [value=667317422, isPrime=false], CustomNumber [value=290978663, isPrime=false], CustomNumber [value=1339534239, isPrime=false], CustomNumber [value=294148515, isPrime=false]]
+Size : 57
+
+
+
